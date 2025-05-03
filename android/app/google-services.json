@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "154895332375",
+    "project_id": "agri-gurad",
+    "storage_bucket": "agri-gurad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154895332375:android:d022ed18b62f0c02e0d852",
+        "android_client_info": {
+          "package_name": "com.example.agri_gurad"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjmF8z8HMrUrDQByhAHA6LonnkvBp8cjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
