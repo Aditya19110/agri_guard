@@ -1,71 +1,71 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Login method
   Future<bool> login(String email, String password) async {
     try {
-      // Sign in with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       if (userCredential.user != null) {
-        return true; // Successfully logged in
+        return true;
       } else {
-        return false; // Login failed
+        return false;
       }
-    } on FirebaseAuthException catch (e) {
-      print("Login failed: ${e.message}");
-      // Handle specific error cases
-      if (e.code == 'user-not-found') {
-        print("No user found for that email.");
-      } else if (e.code == 'wrong-password') {
-        print("Incorrect password.");
-      }
-      return false; // Return false if an error occurred
+    } on FirebaseAuthException {
+      return false;
     }
   }
 
-  // Register method
-  Future<bool> register(String email, String password) async {
+  Future<bool> register({
+    required String email,
+    required String password,
+    required String name,
+    required String address,
+  }) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       if (userCredential.user != null) {
-        // Send email verification after registration
-        await userCredential.user?.sendEmailVerification();
-        print("Registration successful. Verification email sent.");
-        return true; // Registration successful
+        await userCredential.user!.sendEmailVerification();
+
+        try {
+          await _firestore.collection('users').doc(userCredential.user!.uid).set({
+            'uid': userCredential.user!.uid,
+            'email': email,
+            'name': name,
+            'address': address,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        } catch (_) {
+          return false;
+        }
+
+        return true;
       } else {
-        return false; // Registration failed
+        return false;
       }
-    } on FirebaseAuthException catch (e) {
-      print("Registration failed: ${e.message}");
-      // Handle specific error cases
-      if (e.code == 'weak-password') {
-        print("The password is too weak.");
-      } else if (e.code == 'email-already-in-use') {
-        print("The account already exists for that email.");
-      } else if (e.code == 'invalid-email') {
-        print("The email address is not valid.");
-      }
-      return false; // Return false if an error occurred
+    } on FirebaseAuthException {
+      return false;
+    } catch (_) {
+      return false;
     }
   }
 
-  // Method to log out
+  // Logout method
   Future<void> logout() async {
     await _auth.signOut();
   }
 
-  // Get the current user
-  User? get currentUser {
-    return _auth.currentUser;
-  }
+  // Current user getter
+  User? get currentUser => _auth.currentUser;
 }

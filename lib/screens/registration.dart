@@ -7,24 +7,36 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
+  final _addressController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   _register() async {
-    if (_passwordController.text == _confirmPasswordController.text) {
-      // Register the user
-      bool success = await AuthService().register(
-        _emailController.text,
-        _passwordController.text,
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
       );
-      if (success) {
-        Navigator.pushReplacementNamed(context, '/login');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed')));
-      }
+      return;
+    }
+
+    bool success = await AuthService().register(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      name: _nameController.text.trim(),
+      address: _addressController.text.trim(),
+    );
+
+    if (success) {
+      Navigator.pushReplacementNamed(context, '/login');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Passwords do not match')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email already in use or registration failed')),
+      );
     }
   }
 
@@ -32,23 +44,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Register')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Name'),
+            ),
+            TextField(
+              controller: _addressController,
+              decoration: InputDecoration(labelText: 'Address'),
+            ),
+            TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                  icon: Icon(_obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
             ),
             TextField(
               controller: _confirmPasswordController,
-              decoration: InputDecoration(labelText: 'Confirm Password'),
-              obscureText: true,
+              obscureText: _obscureConfirmPassword,
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureConfirmPassword
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
+                ),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(onPressed: _register, child: Text('Register')),

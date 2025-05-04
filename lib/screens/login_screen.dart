@@ -10,14 +10,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool _obscurePassword = true;
+
   _login() async {
-    // Perform login logic here (Firebase or any auth service)
-    bool success = await AuthService().login(_emailController.text, _passwordController.text);
+    bool success = await AuthService().login(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
     if (success) {
       Navigator.pushReplacementNamed(context, '/dashboard');
     } else {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed')),
+      );
     }
   }
 
@@ -32,11 +38,24 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(onPressed: _login, child: Text('Login')),

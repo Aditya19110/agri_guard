@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -13,10 +14,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
   LatLng? currentLocation;
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
+  String userName = 'Agri Guard User';
+  String userEmail = '';
+
   @override
   void initState() {
     super.initState();
     _determinePosition();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    if (currentUser != null) {
+      setState(() {
+        userEmail = currentUser!.email ?? 'No Email';
+      });
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('name')) {
+          setState(() {
+            userName = data['name'];
+          });
+        }
+      }
+    }
   }
 
   Future<void> _determinePosition() async {
@@ -67,8 +94,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(currentUser?.displayName ?? 'Agri Guard User'),
-              accountEmail: Text(currentUser?.email ?? 'No Email'),
+              accountName: Text(userName),
+              accountEmail: Text(userEmail),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.orange,
                 child: Icon(Icons.agriculture, color: Colors.white),
@@ -79,14 +106,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               leading: const Icon(Icons.home),
               title: const Text('Home'),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushReplacementNamed(context, '/dashboard');
               },
             ),
             ListTile(
               leading: const Icon(Icons.map),
-              title: const Text('Live Location'),
+              title: const Text('Settings'),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/dashboard');
+                Navigator.pushReplacementNamed(context, '/settings');
               },
             ),
             ListTile(
