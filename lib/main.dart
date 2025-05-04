@@ -11,8 +11,7 @@ void main() async {
 
   // Activate Firebase App Check
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.playIntegrity, // Use playIntegrity for production
-    // androidProvider: AndroidProvider.debug, // Uncomment this during development ONLY
+    androidProvider: AndroidProvider.playIntegrity,
   );
 
   runApp(MyApp());
