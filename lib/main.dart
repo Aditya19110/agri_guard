@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart'; // Import App Check
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:agri_gurad/routes.dart';
 
 void main() async {
@@ -9,7 +9,6 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp();
 
-  // Activate Firebase App Check
   await FirebaseAppCheck.instance.activate(
     androidProvider: AndroidProvider.playIntegrity,
   );
