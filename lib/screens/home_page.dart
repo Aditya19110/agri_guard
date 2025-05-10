@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:agri_gurad/widgets/app_drawer.dart';
+import 'package:agri_gurad/screens/prediction.dart';  // Import the PredictionPage
+import 'package:agri_gurad/screens/history_screen.dart';  // Import the HistoryScreen
+import 'package:agri_gurad/screens/nearby_store.dart';  // Import the NearbyStoresScreen
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -11,102 +13,123 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  GoogleMapController? mapController;
-  LatLng? currentLocation;
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  final picker = ImagePicker();
 
-  @override
-  void initState() {
-    super.initState();
-    _determinePosition();
-  }
-
-  Future<void> _determinePosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
+  Future<void> _pickImageAndNavigate() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+      // Directly navigate to the PredictionPage with the imageFile
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PredictionPage(imageFile: imageFile),
+        ),
+      );
     }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
-        return;
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-    setState(() {
-      currentLocation = LatLng(position.latitude, position.longitude);
-    });
-  }
-
-  void _openDrawer(BuildContext context) {
-    Scaffold.of(context).openDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agri Guard Plus Dashboard'),
+        title: const Text('Agri Guard Plus'),
         centerTitle: true,
+        backgroundColor: const Color(0xFF00796B),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
-            onPressed: () => _openDrawer(context),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
       ),
-      drawer: const AppDrawer(), 
-      body: currentLocation == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-                  child: Text(
-                    'Live Location Overview',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF00796B),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Latitude: ${currentLocation!.latitude}\nLongitude: ${currentLocation!.longitude}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: GoogleMap(
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                    },
-                    initialCameraPosition: CameraPosition(
-                      target: currentLocation!,
-                      zoom: 16.0,
-                    ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId('current_location'),
-                        position: currentLocation!,
-                        infoWindow: const InfoWindow(title: 'You are here'),
-                      ),
-                    },
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-                    zoomControlsEnabled: true,
-                  ),
-                ),
-              ],
+      drawer: const AppDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 24),
+            const Text(
+              'Welcome to Agri Guard Plus 🌱',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF00796B),
+              ),
             ),
+            const SizedBox(height: 32),
+            _buildCardButton(
+              icon: Icons.upload,
+              label: 'Upload Image',
+              color: Colors.green[400]!,
+              onTap: _pickImageAndNavigate,
+            ),
+            const SizedBox(height: 20),
+            _buildCardButton(
+              icon: Icons.history,
+              label: 'History',
+              color: Colors.teal[400]!,
+              onTap: () {
+                // Directly navigate to the HistoryScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            _buildCardButton(
+              icon: Icons.store,
+              label: 'Nearby Stores',
+              color: Colors.deepOrange[300]!,
+              onTap: () {
+                // Directly navigate to the NearbyStoresScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NearbyStoresScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        color: color,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 28),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
