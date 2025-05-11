@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:agri_gurad/widgets/app_drawer.dart';
-import 'package:agri_gurad/screens/prediction.dart';  // Import the PredictionPage
-import 'package:agri_gurad/screens/history_screen.dart';  // Import the HistoryScreen
-import 'package:agri_gurad/screens/nearby_store.dart';  // Import the NearbyStoresScreen
+import 'package:agri_gurad/screens/prediction.dart';  
+import 'package:agri_gurad/screens/history_screen.dart'; 
+import 'package:agri_gurad/screens/nearby_store.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -20,7 +20,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final File imageFile = File(pickedFile.path);
-      // Directly navigate to the PredictionPage with the imageFile
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -73,7 +72,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               label: 'History',
               color: Colors.teal[400]!,
               onTap: () {
-                // Directly navigate to the HistoryScreen
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => HistoryScreen()),
@@ -86,7 +84,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               label: 'Nearby Stores',
               color: Colors.deepOrange[300]!,
               onTap: () {
-                // Directly navigate to the NearbyStoresScreen
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => NearbyStoresScreen()),
