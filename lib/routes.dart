@@ -9,12 +9,12 @@ import 'package:agri_gurad/screens/history_screen.dart';
 import 'package:agri_gurad/screens/nearby_store.dart';
 
 final Map<String, WidgetBuilder> routes = {
-  '/': (context) => SplashScreen(),
-  '/login': (context) => LoginScreen(),
-  '/register': (context) => RegisterScreen(),
-  '/dashboard': (context) => DashboardScreen(),
-  '/settings': (context) => SettingsPage(),
-  '/history':(context) => HistoryScreen(),
-  '/stores':(context)=> NearbyStoresScreen(),
-  '/prediction':(context) => PredictionPage(),
+  '/': (context) => const SplashScreen(),
+  '/login': (context) => const LoginScreen(),
+  '/register': (context) => const RegisterScreen(),
+  '/dashboard': (context) => const DashboardScreen(),
+  '/settings': (context) => const SettingsPage(),
+  '/history':(context) => const HistoryScreen(),
+  '/stores':(context)=> const NearbyStoresScreen(),
+  '/prediction':(context) => const PredictionPage(),
 };

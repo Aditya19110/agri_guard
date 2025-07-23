@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# OS generated files
+Thumbs.db
+*.tmp
+*.temp
+*~
+
 
 # IntelliJ related
 *.iml
@@ -30,9 +36,17 @@ migrate_working_dir/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
+.fvm/
 /build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# Coverage
+coverage/
 
 # Symbolication related
 app.*.symbols
@@ -44,3 +58,72 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android related
+android/local.properties
+android/key.properties
+android/app/release/
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+
+# iOS related
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules (keep certain iOS files)
+!**/ios/**/default.mode1v3
+!**/ios/**/default.mode2v3
+!**/ios/**/default.pbxuser
+!**/ios/**/default.perspectivev3
+
+# Firebase configuration (keep these files but be careful with sensitive keys)
+# android/app/google-services.json
+# ios/Runner/GoogleService-Info.plist
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.keystore
+key.properties
+
+# TensorFlow Lite models (uncomment if you want to exclude large model files)
+# *.tflite
+# assets/tfmodel/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+*.config.dart
