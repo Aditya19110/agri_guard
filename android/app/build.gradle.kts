@@ -35,7 +35,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // Change this for production
+            signingConfig = signingConfigs.getByName("debug") 
         }
     }
 }
