@@ -29,34 +29,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      try {
-        bool success = await AuthService().register(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          name: _nameController.text.trim(),
-          address: _addressController.text.trim(),
-        );
+      final result = await AuthService().register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        name: _nameController.text.trim(),
+        address: _addressController.text.trim(),
+      );
 
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
 
-          if (success) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const RegistrationSuccessScreen()),
-            );
-          } else {
-            _showErrorSnackBar('Email already in use or registration failed');
-          }
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          _showErrorSnackBar('An error occurred. Please try again.');
+        if (result.success) {
+          _showSuccessSnackBar(result.message ?? 'Registration successful!');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RegistrationSuccessScreen()),
+          );
+        } else {
+          _showErrorSnackBar(result.errorMessage ?? 'Registration failed');
         }
       }
     }
@@ -73,6 +65,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ],
         ),
         backgroundColor: AppTheme.errorColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppTheme.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),

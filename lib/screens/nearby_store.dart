@@ -17,6 +17,7 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
   Set<Marker> _markers = {};
   bool _isLoading = true;
   String? _errorMessage;
+  bool _mapLoadingError = false;
 
   // Sample stores data
   final List<Map<String, dynamic>> _sampleStores = [
@@ -54,19 +55,23 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
 
   Future<void> _getCurrentLocation() async {
     try {
+      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() {
           _errorMessage = 'Location services are disabled. Please enable location services.';
           _isLoading = false;
         });
+        // Optionally, open location settings
+        await Geolocator.openLocationSettings();
         return;
       }
 
+      // Check and request location permissions
       LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) {
+        if (permission == LocationPermission.denied) {
           setState(() {
             _errorMessage = 'Location permission denied. Please grant permission to find nearby stores.';
             _isLoading = false;
@@ -75,7 +80,20 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
         }
       }
 
-      Position position = await Geolocator.getCurrentPosition();
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          _errorMessage = 'Location permissions are permanently denied. Please enable them in settings.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Get current position with high accuracy
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
+      );
+      
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
         _isLoading = false;
@@ -83,7 +101,7 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
       _addMarkers(position.latitude, position.longitude);
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to get location. Please try again.';
+        _errorMessage = 'Failed to get location: ${e.toString()}. Please try again.';
         _isLoading = false;
       });
     }
@@ -291,8 +309,18 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
                 bottomRight: Radius.circular(AppConstants.borderRadiusLarge),
               ),
               child: GoogleMap(
-                onMapCreated: (controller) {
-                  mapController = controller;
+                onMapCreated: (GoogleMapController controller) {
+                  try {
+                    mapController = controller;
+                    setState(() {
+                      _mapLoadingError = false;
+                    });
+                  } catch (e) {
+                    setState(() {
+                      _mapLoadingError = true;
+                      _errorMessage = 'Failed to load map: ${e.toString()}';
+                    });
+                  }
                 },
                 initialCameraPosition: CameraPosition(
                   target: currentLocation!,
@@ -304,6 +332,17 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
                 zoomControlsEnabled: true,
                 compassEnabled: true,
                 mapToolbarEnabled: true,
+                rotateGesturesEnabled: true,
+                scrollGesturesEnabled: true,
+                zoomGesturesEnabled: true,
+                tiltGesturesEnabled: true,
+                mapType: MapType.normal,
+                onTap: (LatLng position) {
+                  // Handle map tap if needed
+                },
+                onCameraMove: (CameraPosition position) {
+                  // Handle camera movement if needed
+                },
               ),
             ),
           ),

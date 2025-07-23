@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        bool success = await AuthService().login(
+        final result = await AuthService().login(
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
@@ -35,10 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
 
-          if (success) {
+          if (result.success) {
+            // Update last login timestamp
+            await AuthService().updateLastLogin();
             Navigator.pushReplacementNamed(context, '/dashboard');
+          } else if (result.needsEmailVerification) {
+            _showEmailVerificationDialog(result.errorMessage ?? 'Please verify your email');
           } else {
-            _showErrorSnackBar('Invalid email or password. Please try again.');
+            _showErrorSnackBar(result.errorMessage ?? 'Login failed. Please try again.');
           }
         }
       } catch (e) {
@@ -46,10 +50,80 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _isLoading = false;
           });
-          _showErrorSnackBar('An error occurred. Please try again.');
+          _showErrorSnackBar('An unexpected error occurred. Please try again.');
         }
       }
     }
+  }
+
+  void _showEmailVerificationDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.email_outlined, color: AppTheme.primaryOrange),
+            SizedBox(width: AppConstants.paddingSmall),
+            Text('Email Verification Required'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(message),
+            const SizedBox(height: AppConstants.paddingMedium),
+            const Text(
+              'Would you like us to resend the verification email?',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final result = await AuthService().resendEmailVerification();
+              if (mounted) {
+                if (result.success) {
+                  _showSuccessSnackBar(result.message ?? 'Verification email sent!');
+                } else {
+                  _showErrorSnackBar(result.errorMessage ?? 'Failed to send verification email');
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+            child: const Text('Resend Email', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppTheme.successColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+        ),
+      ),
+    );
   }
 
   void _showErrorSnackBar(String message) {
@@ -202,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 
                 const SizedBox(height: AppConstants.paddingLarge),
                 
-                // Register Link
+                // Login Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -221,6 +295,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
+                ),
+                
+                const SizedBox(height: AppConstants.paddingMedium),
+                
+                // Forgot Password Link
+                Center(
+                  child: TextButton(
+                    onPressed: _showForgotPasswordDialog,
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -296,6 +386,68 @@ class _LoginScreenState extends State<LoginScreen> {
         borderSide: const BorderSide(color: AppTheme.errorColor),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    );
+  }
+
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.lock_reset, color: AppTheme.primaryGreen),
+            SizedBox(width: AppConstants.paddingSmall),
+            Text('Reset Password'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your email address to receive a password reset link.'),
+            const SizedBox(height: AppConstants.paddingMedium),
+            TextFormField(
+              controller: emailController,
+              decoration: _buildInputDecoration(
+                label: 'Email Address',
+                hint: 'Enter your email',
+                icon: Icons.email_outlined,
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              emailController.dispose();
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (emailController.text.trim().isNotEmpty) {
+                Navigator.pop(context);
+                final result = await AuthService().resetPassword(emailController.text.trim());
+                if (mounted) {
+                  if (result.success) {
+                    _showSuccessSnackBar(result.message ?? 'Password reset email sent!');
+                  } else {
+                    _showErrorSnackBar(result.errorMessage ?? 'Failed to send reset email');
+                  }
+                }
+              }
+              emailController.dispose();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+            child: const Text('Send Reset Link', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 

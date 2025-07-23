@@ -118,6 +118,15 @@ android/gradle/wrapper/gradle-wrapper.jar
 *.keystore
 key.properties
 
+# Firebase configuration files with sensitive data
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# API Keys and sensitive configuration
+**/AndroidManifest.xml.backup
+**/*api_key*
+**/*API_KEY*
+
 # TensorFlow Lite models (uncomment if you want to exclude large model files)
 # *.tflite
 # assets/tfmodel/

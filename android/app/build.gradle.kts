@@ -5,6 +5,13 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+// Load local properties for secure configuration
+val localProperties = java.util.Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
 android {
     namespace = "com.example.agri_gurad"
     compileSdk = flutter.compileSdkVersion
@@ -25,6 +32,11 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Secure API key configuration
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("flutter.mapsApiKey") 
+            ?: System.getenv("MAPS_API_KEY") 
+            ?: "YOUR_API_KEY_HERE"
     }
 
     buildTypes {
