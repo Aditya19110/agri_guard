@@ -225,40 +225,6 @@ flutter build apk --release
 flutter build ios --release
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow [Flutter style guide](https://dart.dev/guides/language/effective-dart/style)
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🎯 Roadmap
-
-### Version 1.1.0
-- [ ] Weather integration
-- [ ] Crop calendar and reminders
-- [ ] Multi-language support
-- [ ] Offline disease detection
-
-### Version 1.2.0
-- [ ] Social features (farmer community)
-- [ ] Expert consultation booking
-- [ ] Advanced analytics dashboard
-- [ ] IoT sensor integration
 
 ## 🆘 Support
 
@@ -273,19 +239,13 @@ A: Check that location permissions are granted and GPS is enabled on your device
 **Q: How do I backup my analysis history?**
 A: Enable data backup in Settings. Your data will be automatically synced to the cloud.
 
-### Getting Help
-
-- 📧 **Email**: support@agriguardplus.com
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/Aditya19110/agri_gurad/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/Aditya19110/agri_gurad/discussions)
-- 📖 **Documentation**: [Wiki](https://github.com/Aditya19110/agri_gurad/wiki)
 
 ## 👨‍💻 Author
 
 **Aditya Kulkarni**
 - GitHub: [@Aditya19110](https://github.com/Aditya19110)
-- Email: aditya.kulkarni@example.com
-- LinkedIn: [Aditya Kulkarni](https://linkedin.com/in/aditya-kulkarni)
+- Email: aditya.kulkarnicse@gmail.com
+- LinkedIn: [Aditya Kulkarni](https://linkedin.com/in/aditya191103)
 
 ## 🙏 Acknowledgments
 

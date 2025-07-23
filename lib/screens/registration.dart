@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:agri_gurad/services/auth_service.dart';
-import 'package:agri_gurad/screens/regsitration_success.dart';
+import 'package:agri_gurad/screens/registration_success.dart';
 import 'package:agri_gurad/config/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
