@@ -279,53 +279,57 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 
                 // Action Cards
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: AppConstants.paddingMedium,
-                    mainAxisSpacing: AppConstants.paddingMedium,
-                    children: [
-                      _buildFeatureCard(
-                        icon: Icons.camera_alt,
-                        title: 'Scan Crop',
-                        subtitle: 'Detect diseases instantly',
-                        color: AppTheme.primaryGreen,
-                        onTap: _showImageSourceDialog,
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.history,
-                        title: 'History',
-                        subtitle: 'View past scans',
-                        color: AppTheme.secondaryGreen,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const HistoryScreen()),
-                          );
-                        },
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.store,
-                        title: 'Nearby Stores',
-                        subtitle: 'Find agricultural supplies',
-                        color: AppTheme.primaryOrange,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const NearbyStoresScreen()),
-                          );
-                        },
-                      ),
-                      _buildFeatureCard(
-                        icon: Icons.info_outline,
-                        title: 'Tips & Guides',
-                        subtitle: 'Agricultural insights',
-                        color: AppTheme.secondaryOrange,
-                        onTap: () {
-                          // TODO: Implement tips and guides screen
-                          _showErrorSnackBar('Feature coming soon!');
-                        },
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppConstants.paddingMedium),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: AppConstants.paddingMedium,
+                      mainAxisSpacing: AppConstants.paddingMedium,
+                      childAspectRatio: 0.9, // Adjust ratio to prevent overflow
+                      children: [
+                        _buildFeatureCard(
+                          icon: Icons.camera_alt,
+                          title: 'Scan Crop',
+                          subtitle: 'Detect diseases instantly',
+                          color: AppTheme.primaryGreen,
+                          onTap: _showImageSourceDialog,
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.history,
+                          title: 'History',
+                          subtitle: 'View past scans',
+                          color: AppTheme.secondaryGreen,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                            );
+                          },
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.store,
+                          title: 'Nearby Stores',
+                          subtitle: 'Find agricultural supplies',
+                          color: AppTheme.primaryOrange,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const NearbyStoresScreen()),
+                            );
+                          },
+                        ),
+                        _buildFeatureCard(
+                          icon: Icons.info_outline,
+                          title: 'Tips & Guides',
+                          subtitle: 'Agricultural insights',
+                          color: AppTheme.secondaryOrange,
+                          onTap: () {
+                            // TODO: Implement tips and guides screen
+                            _showErrorSnackBar('Feature coming soon!');
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -357,44 +361,55 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppConstants.paddingMedium),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: AppConstants.iconXLarge,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: AppConstants.paddingMedium),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppConstants.paddingSmall),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingSmall),
-              child: Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.paddingMedium),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                child: Icon(
+                  icon,
+                  size: AppConstants.iconLarge,
+                  color: color,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: AppConstants.paddingSmall),
+              Flexible(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

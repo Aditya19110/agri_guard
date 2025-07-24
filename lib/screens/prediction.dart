@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:agri_gurad/config/app_theme.dart';
+import 'package:agri_gurad/services/history_service.dart';
 
 class PredictionPage extends StatefulWidget {
   final File? imageFile;
@@ -19,6 +20,7 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
   bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  final HistoryService _historyService = HistoryService();
 
   // Disease labels (update these based on your trained model)
   final List<String> _diseaseLabels = [
@@ -65,8 +67,6 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
 
     setState(() {
       _isLoading = true;
-      _predictionResult = '';
-      _confidence = 0.0;
     });
 
     try {
@@ -89,6 +89,9 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
         _confidence = predictions[maxIndex];
         _isLoading = false;
       });
+      
+      // Save analysis result to history
+      await _saveAnalysisToHistory();
       
       interpreter.close();
     } catch (e) {
@@ -181,6 +184,45 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
       return AppTheme.errorColor;
     } else {
       return AppTheme.primaryOrange;
+    }
+  }
+
+  /// Saves the analysis result to user's history
+  Future<void> _saveAnalysisToHistory() async {
+    if (widget.imageFile == null || _predictionResult.isEmpty) return;
+
+    try {
+      final success = await _historyService.saveAnalysisResult(
+        diseaseResult: _predictionResult,
+        confidence: _confidence,
+        imagePath: widget.imageFile!.path,
+        recommendations: _getRecommendation(_predictionResult),
+        additionalData: {
+          'imageSize': await widget.imageFile!.length(),
+          'analysisDate': DateTime.now().toIso8601String(),
+        },
+      );
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Analysis saved to history'),
+              ],
+            ),
+            backgroundColor: AppTheme.successColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error saving analysis to history: $e');
     }
   }
 

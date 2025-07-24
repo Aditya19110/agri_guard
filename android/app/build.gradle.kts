@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,7 +8,7 @@ plugins {
 }
 
 // Load local properties for secure configuration
-val localProperties = java.util.Properties()
+val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
@@ -15,7 +17,6 @@ if (localPropertiesFile.exists()) {
 android {
     namespace = "com.example.agri_gurad"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

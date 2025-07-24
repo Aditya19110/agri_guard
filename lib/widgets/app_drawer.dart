@@ -89,11 +89,12 @@ class _AppDrawerState extends State<AppDrawer> {
                 padding: const EdgeInsets.all(AppConstants.paddingLarge),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Profile Picture
                     Container(
-                      width: 70,
-                      height: 70,
+                      width: 60,
+                      height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(0.2),
@@ -102,31 +103,35 @@ class _AppDrawerState extends State<AppDrawer> {
                       child: const Icon(
                         Icons.agriculture_rounded,
                         color: Colors.white,
-                        size: 35,
+                        size: 30,
                       ),
                     ),
-                    const SizedBox(height: AppConstants.paddingMedium),
+                    const SizedBox(height: AppConstants.paddingSmall),
                     
                     // User Info
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Flexible(
+                      child: Text(
+                        userName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      userEmail,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
+                    const SizedBox(height: 2),
+                    Flexible(
+                      child: Text(
+                        userEmail,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -137,7 +142,7 @@ class _AppDrawerState extends State<AppDrawer> {
           // Menu Items
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: AppConstants.paddingMedium),
+              padding: const EdgeInsets.only(top: AppConstants.paddingSmall),
               children: [
                 _buildDrawerItem(
                   icon: Icons.dashboard_rounded,
@@ -201,18 +206,24 @@ class _AppDrawerState extends State<AppDrawer> {
                     _showHelpDialog();
                   },
                 ),
+                const SizedBox(height: AppConstants.paddingLarge),
               ],
             ),
           ),
           
           // Logout Section
-          Container(
-            margin: const EdgeInsets.all(AppConstants.paddingMedium),
-            child: _buildDrawerItem(
-              icon: Icons.logout_rounded,
-              title: 'Logout',
-              onTap: () => _logout(context),
-              isDestructive: true,
+          SafeArea(
+            minimum: const EdgeInsets.only(bottom: AppConstants.paddingSmall),
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingMedium,
+              ),
+              child: _buildDrawerItem(
+                icon: Icons.logout_rounded,
+                title: 'Logout',
+                onTap: () => _logout(context),
+                isDestructive: true,
+              ),
             ),
           ),
         ],
@@ -273,29 +284,33 @@ class _AppDrawerState extends State<AppDrawer> {
               size: AppConstants.iconLarge,
             ),
             const SizedBox(width: AppConstants.paddingSmall),
-            const Text('About AgriGuard Plus'),
+            const Flexible(
+              child: Text('About AgriGuard Plus'),
+            ),
           ],
         ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'AgriGuard Plus is your smart agriculture companion for crop disease detection and management.',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: AppConstants.paddingMedium),
-            Text('Version: 1.0.0'),
-            Text('Developer: Aditya K.'),
-            SizedBox(height: AppConstants.paddingMedium),
-            Text(
-              '© 2024 AgriGuard Plus. All rights reserved.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.textSecondary,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'AgriGuard Plus is your smart agriculture companion for crop disease detection and management.',
+                style: TextStyle(fontSize: 16),
               ),
-            ),
-          ],
+              const SizedBox(height: AppConstants.paddingMedium),
+              const Text('Version: 1.0.0'),
+              const Text('Developer: Aditya K.'),
+              const SizedBox(height: AppConstants.paddingMedium),
+              Text(
+                '© 2024 AgriGuard Plus. All rights reserved.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -325,33 +340,37 @@ class _AppDrawerState extends State<AppDrawer> {
               size: AppConstants.iconLarge,
             ),
             SizedBox(width: AppConstants.paddingSmall),
-            Text('Help & Support'),
+            Flexible(
+              child: Text('Help & Support'),
+            ),
           ],
         ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Need help with AgriGuard Plus?',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Need help with AgriGuard Plus?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            SizedBox(height: AppConstants.paddingMedium),
-            Text('• Take clear photos of affected crop areas'),
-            Text('• Ensure good lighting for better analysis'),
-            Text('• Follow the recommendations provided'),
-            Text('• Contact agricultural experts for severe cases'),
-            SizedBox(height: AppConstants.paddingMedium),
-            Text(
-              'For technical support, please contact:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            Text('Email: support@agriguardplus.com'),
-            Text('Phone: +1 234-567-8900'),
-          ],
+              const SizedBox(height: AppConstants.paddingMedium),
+              const Text('• Take clear photos of affected crop areas'),
+              const Text('• Ensure good lighting for better analysis'),
+              const Text('• Follow the recommendations provided'),
+              const Text('• Contact agricultural experts for severe cases'),
+              const SizedBox(height: AppConstants.paddingMedium),
+              const Text(
+                'For technical support, please contact:',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const Text('Email: support@agriguardplus.com'),
+              const Text('Phone: +1 234-567-8900'),
+            ],
+          ),
         ),
         actions: [
           TextButton(
