@@ -38,7 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
           if (result.success) {
             // Update last login timestamp
             await AuthService().updateLastLogin();
-            Navigator.pushReplacementNamed(context, '/dashboard');
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, '/dashboard');
+            }
           } else if (result.needsEmailVerification) {
             _showEmailVerificationDialog(result.errorMessage ?? 'Please verify your email');
           } else {
@@ -456,59 +458,5 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-}
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              
-              // Navigation to Register
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/register'),
-                child: Text("Don't have an account? Register"),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String label, IconData icon, String hint) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      prefixIcon: Icon(icon),
-      filled: true,
-      fillColor: Colors.grey.shade100,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-    );
-  }
-
-  InputDecoration _passwordDecoration({
-    required String label,
-    required String hint,
-    required bool obscureText,
-    required VoidCallback toggle,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      prefixIcon: Icon(Icons.lock),
-      suffixIcon: IconButton(
-        icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
-        onPressed: toggle,
-      ),
-      filled: true,
-      fillColor: Colors.grey.shade100,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-    );
   }
 }

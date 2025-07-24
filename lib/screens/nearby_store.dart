@@ -14,10 +14,9 @@ class NearbyStoresScreen extends StatefulWidget {
 class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
   GoogleMapController? mapController;
   LatLng? currentLocation;
-  Set<Marker> _markers = {};
+  final Set<Marker> _markers = {};
   bool _isLoading = true;
   String? _errorMessage;
-  bool _mapLoadingError = false;
 
   // Sample stores data
   final List<Map<String, dynamic>> _sampleStores = [
@@ -90,8 +89,10 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
 
       // Get current position with high accuracy
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
+        ),
       );
       
       setState(() {
@@ -312,12 +313,8 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
                 onMapCreated: (GoogleMapController controller) {
                   try {
                     mapController = controller;
-                    setState(() {
-                      _mapLoadingError = false;
-                    });
                   } catch (e) {
                     setState(() {
-                      _mapLoadingError = true;
                       _errorMessage = 'Failed to load map: ${e.toString()}';
                     });
                   }
@@ -503,58 +500,6 @@ class _NearbyStoresScreenState extends State<NearbyStoresScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-    ));
-    // Example of adding nearby stores (replace with real data from an API)
-    _markers.add(Marker(
-      markerId: MarkerId('store_1'),
-      position: LatLng(lat + 0.002, lng + 0.002),
-      infoWindow: InfoWindow(title: 'Store 1'),
-    ));
-    _markers.add(Marker(
-      markerId: MarkerId('store_2'),
-      position: LatLng(lat - 0.003, lng - 0.003),
-      infoWindow: InfoWindow(title: 'Store 2'),
-    ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nearby Stores'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: const AppDrawer(),
-      body: currentLocation == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Google Map displaying user's location and nearby stores
-                Expanded(
-                  child: GoogleMap(
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                    },
-                    initialCameraPosition: CameraPosition(
-                      target: currentLocation!,
-                      zoom: 14.0,
-                    ),
-                    markers: _markers,
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-                    zoomControlsEnabled: true,
-                  ),
-                ),
-              ],
-            ),
     );
   }
 }

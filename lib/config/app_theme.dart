@@ -31,7 +31,6 @@ class AppTheme {
         primary: primaryGreen,
         secondary: secondaryGreen,
         surface: surfaceColor,
-        background: backgroundColor,
         error: errorColor,
       ),
       
@@ -75,7 +74,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: accentGreen.withOpacity(0.3)),
+          borderSide: BorderSide(color: accentGreen.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -88,15 +87,6 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         labelStyle: const TextStyle(color: textSecondary),
         hintStyle: const TextStyle(color: textHint),
-      ),
-      
-      // Card Theme
-      cardTheme: CardTheme(
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        margin: const EdgeInsets.symmetric(vertical: 8),
       ),
       
       // Text Theme
