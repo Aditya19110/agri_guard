@@ -240,12 +240,17 @@ A: Check that location permissions are granted and GPS is enabled on your device
 A: Enable data backup in Settings. Your data will be automatically synced to the cloud.
 
 
-## 👨‍💻 Author
+## 👨‍💻 Contributor
 
 **Aditya Kulkarni**
 - GitHub: [@Aditya19110](https://github.com/Aditya19110)
 - Email: aditya.kulkarnicse@gmail.com
 - LinkedIn: [Aditya Kulkarni](https://linkedin.com/in/aditya191103)
+
+**Vedika Lohiya**
+- GitHub: [@vedikalohiya](https://github.com/vedikalohiya)
+- Email: vedika.lohiyacse@gmail.com
+- LinkedIn: [Vedika Lohiya](https://linkedin.com/in/vedika2203)
 
 ## 🙏 Acknowledgments
 
