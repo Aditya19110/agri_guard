@@ -63,6 +63,9 @@ android/captures/
 android/gradlew
 android/gradlew.bat
 android/gradle/wrapper/gradle-wrapper.jar
+android/app/.cxx/
+android/build/
+android/app/build/
 
 # Firebase configuration (keep these files but be careful with sensitive keys)
 # android/app/google-services.json
