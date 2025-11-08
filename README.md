@@ -1,4 +1,4 @@
-# 🌱 AgriGuard Plus
+# AgriGuard Plus
 
 > Your Smart Agriculture Companion for Crop Disease Detection
 
@@ -9,45 +9,35 @@
 
 AgriGuard Plus is an intelligent mobile application that helps farmers and agricultural professionals detect crop diseases using advanced machine learning technology. Simply capture a photo of your crop, and get instant disease identification with treatment recommendations.
 
-## 🚀 Features
+## Features
 
-### 📸 AI-Powered Disease Detection
+### AI-Powered Disease Detection
 - **Real-time Analysis**: Instant crop disease identification using TensorFlow Lite
 - **High Accuracy**: Advanced machine learning model trained on agricultural datasets
 - **Multiple Diseases**: Detects various crop diseases including Bacterial Blight, Brown Spot, Leaf Smut, Blast Disease, and Tungro
 - **Confidence Scoring**: Shows prediction confidence levels with visual indicators
 
-### 🎯 Smart Recommendations
+### Smart Recommendations
 - **Treatment Suggestions**: Disease-specific treatment and prevention recommendations
 - **Expert Guidance**: Professional agricultural advice for each detected condition
 - **Preventive Measures**: Tips to prevent future occurrences
 
-### 📍 Location Services
+### Location Services
 - **Nearby Stores**: Find agricultural supply stores near your location
 - **Google Maps Integration**: Interactive maps with store information
 - **Store Details**: Contact information, ratings, and operating hours
 
-### 📊 History & Tracking
+### History & Tracking
 - **Analysis History**: Keep track of all your crop disease analyses
 - **Progress Monitoring**: Monitor crop health over time
 - **Data Export**: Export analysis data for record keeping
 
-### 🔐 User Management
+### User Management
 - **Secure Authentication**: Firebase-powered user authentication
 - **Profile Management**: Manage your agricultural profile and preferences
 - **Data Sync**: Cloud synchronization across devices
 
-## 📱 Screenshots
-
-| Splash Screen | Login | Dashboard | Disease Analysis |
-|:---:|:---:|:---:|:---:|
-| ![Splash](screenshots/splash.png) | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![Analysis](screenshots/analysis.png) |
-
-| History | Nearby Stores | Settings | Results |
-|:---:|:---:|:---:|:---:|
-| ![History](screenshots/history.png) | ![Stores](screenshots/stores.png) | ![Settings](screenshots/settings.png) | ![Results](screenshots/results.png) |
-
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Frontend**: Flutter 3.7.2+
 - **Backend**: Firebase (Authentication, Firestore, Storage)
@@ -57,7 +47,7 @@ AgriGuard Plus is an intelligent mobile application that helps farmers and agric
 - **Image Processing**: Image Picker, Image Processing
 - **Location**: Geolocator, Permission Handler
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -77,7 +67,7 @@ Before you begin, ensure you have the following installed:
 - iOS Simulator or physical iOS device
 - CocoaPods
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 
@@ -138,7 +128,7 @@ flutter build apk --release
 flutter build ios --release
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 agri_gurad/
@@ -169,7 +159,7 @@ agri_gurad/
 └── README.md                      # This file
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
@@ -193,7 +183,7 @@ flutter drive --target=test_driver/app.dart
 - [ ] Data persistence and sync
 - [ ] Offline functionality
 
-## 🚀 Deployment
+## Deployment
 
 ### Android Deployment
 
@@ -225,22 +215,7 @@ flutter build apk --release
 flutter build ios --release
 ```
 
-
-## 🆘 Support
-
-### Frequently Asked Questions
-
-**Q: The app doesn't detect diseases accurately. What should I do?**
-A: Ensure good lighting and clear images. The model works best with well-lit, focused photos of affected crop areas.
-
-**Q: Location services aren't working.**
-A: Check that location permissions are granted and GPS is enabled on your device.
-
-**Q: How do I backup my analysis history?**
-A: Enable data backup in Settings. Your data will be automatically synced to the cloud.
-
-
-## 👨‍💻 Contributor
+## 👨Contributor
 
 **Aditya Kulkarni**
 - GitHub: [@Aditya19110](https://github.com/Aditya19110)
@@ -251,15 +226,6 @@ A: Enable data backup in Settings. Your data will be automatically synced to the
 - GitHub: [@vedikalohiya](https://github.com/vedikalohiya)
 - Email: vedika.lohiyacse@gmail.com
 - LinkedIn: [Vedika Lohiya](https://linkedin.com/in/vedika2203)
-
-## 🙏 Acknowledgments
-
-- [Flutter Team](https://flutter.dev/) for the amazing framework
-- [Firebase](https://firebase.google.com/) for backend services
-- [TensorFlow](https://www.tensorflow.org/) for machine learning capabilities
-- [OpenAI](https://openai.com/) for development assistance
-- Agricultural research institutions for disease datasets
-- The farming community for valuable feedback
 
 ---
 
