@@ -10,20 +10,15 @@
 .history
 .svn/
 .swiftpm/
-migrate_working_dir/
-
-# OS generated files
-Thumbs.db
-*.tmp
-*.temp
-*~
-
 
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
 .idea/
+
+# VS Code related
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -39,9 +34,6 @@ Thumbs.db
 
 # Web related
 lib/generated_plugin_registrant.dart
-
-# Coverage
-coverage/
 
 # Symbolication related
 app.*.symbols
@@ -60,41 +52,24 @@ android/key.properties
 android/app/release/
 android/.gradle/
 android/captures/
-android/gradlew
-android/gradlew.bat
-android/gradle/wrapper/gradle-wrapper.jar
 android/app/.cxx/
 android/build/
 android/app/build/
 
-# Firebase configuration (keep these files but be careful with sensitive keys)
-# android/app/google-services.json
-# ios/Runner/GoogleService-Info.plist
+# Note: We DO NOT ignore gradle wrapper files (gradlew, gradle-wrapper.jar) 
+# so others can build the project.
 
-# Environment variables and secrets
-.env
-.env.local
-.env.production
-.env.staging
-*.key
-*.keystore
-key.properties
-
-# Firebase configuration files with sensitive data
+# Firebase & Secrets
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
-
-# API Keys and sensitive configuration
-**/AndroidManifest.xml.backup
-**/*api_key*
-**/*API_KEY*
-
-# TensorFlow Lite models (uncomment if you want to exclude large model files)
-# *.tflite
-# assets/tfmodel/
+.env
+.env.*
+*.key
+*.keystore
 
 # Generated files
 *.g.dart
 *.freezed.dart
 *.mocks.dart
-*.config.dart
+
+.vscode
