@@ -28,10 +28,11 @@ class _AppDrawerState extends State<AppDrawer> {
       });
 
       try {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser!.uid)
-            .get();
+        DocumentSnapshot userDoc =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(currentUser!.uid)
+                .get();
 
         if (userDoc.exists) {
           Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
@@ -47,21 +48,19 @@ class _AppDrawerState extends State<AppDrawer> {
     }
   }
 
-  Future<void> _logout(BuildContext context) async {
+  Future<void> _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error signing out: ${e.toString()}'),
-            backgroundColor: AppTheme.errorColor,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing out: ${e.toString()}'),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
     }
   }
 
@@ -78,10 +77,7 @@ class _AppDrawerState extends State<AppDrawer> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.primaryGreen,
-                  AppTheme.secondaryGreen,
-                ],
+                colors: [AppTheme.primaryGreen, AppTheme.secondaryGreen],
               ),
             ),
             child: SafeArea(
@@ -97,7 +93,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: const Icon(
@@ -107,7 +103,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       ),
                     ),
                     const SizedBox(height: AppConstants.paddingSmall),
-                    
+
                     // User Info
                     Flexible(
                       child: Text(
@@ -126,7 +122,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       child: Text(
                         userEmail,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 13,
                         ),
                         maxLines: 1,
@@ -138,7 +134,7 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
             ),
           ),
-          
+
           // Menu Items
           Expanded(
             child: ListView(
@@ -184,12 +180,14 @@ class _AppDrawerState extends State<AppDrawer> {
                     Navigator.pushNamed(context, '/settings');
                   },
                 ),
-                
+
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingLarge,
+                  ),
                   child: Divider(),
                 ),
-                
+
                 _buildDrawerItem(
                   icon: Icons.info_outline_rounded,
                   title: 'About',
@@ -210,7 +208,7 @@ class _AppDrawerState extends State<AppDrawer> {
               ],
             ),
           ),
-          
+
           // Logout Section
           SafeArea(
             minimum: const EdgeInsets.only(bottom: AppConstants.paddingSmall),
@@ -221,7 +219,7 @@ class _AppDrawerState extends State<AppDrawer> {
               child: _buildDrawerItem(
                 icon: Icons.logout_rounded,
                 title: 'Logout',
-                onTap: () => _logout(context),
+                onTap: () => _logout(),
                 isDestructive: true,
               ),
             ),
@@ -264,7 +262,7 @@ class _AppDrawerState extends State<AppDrawer> {
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         ),
         hoverColor: AppTheme.lightGreen,
-        splashColor: AppTheme.accentGreen.withOpacity(0.2),
+        splashColor: AppTheme.accentGreen.withValues(alpha: 0.2),
       ),
     );
   }
@@ -272,116 +270,115 @@ class _AppDrawerState extends State<AppDrawer> {
   void _showAboutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              Icons.agriculture_rounded,
-              color: AppTheme.primaryGreen,
-              size: AppConstants.iconLarge,
-            ),
-            const SizedBox(width: AppConstants.paddingSmall),
-            const Flexible(
-              child: Text('About AgriGuard Plus'),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'AgriGuard Plus is your smart agriculture companion for crop disease detection and management.',
-                style: TextStyle(fontSize: 16),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                AppConstants.borderRadiusMedium,
               ),
-              const SizedBox(height: AppConstants.paddingMedium),
-              const Text('Version: 1.0.0'),
-              const Text('Developer: Aditya K.'),
-              const SizedBox(height: AppConstants.paddingMedium),
-              Text(
-                '© 2024 AgriGuard Plus. All rights reserved.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textSecondary,
+            ),
+            title: Row(
+              children: [
+                Icon(
+                  Icons.agriculture_rounded,
+                  color: AppTheme.primaryGreen,
+                  size: AppConstants.iconLarge,
+                ),
+                const SizedBox(width: AppConstants.paddingSmall),
+                const Flexible(child: Text('About AgriGuard Plus')),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'AgriGuard Plus is your smart agriculture companion for crop disease detection and management.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: AppConstants.paddingMedium),
+                  const Text('Version: 1.0.0'),
+                  const Text('Developer: Aditya K.'),
+                  const SizedBox(height: AppConstants.paddingMedium),
+                  Text(
+                    '© 2024 AgriGuard Plus. All rights reserved.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: AppTheme.primaryGreen),
                 ),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: AppTheme.primaryGreen),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
   void _showHelpDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        ),
-        title: const Row(
-          children: [
-            Icon(
-              Icons.help_outline_rounded,
-              color: AppTheme.primaryGreen,
-              size: AppConstants.iconLarge,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                AppConstants.borderRadiusMedium,
+              ),
             ),
-            SizedBox(width: AppConstants.paddingSmall),
-            Flexible(
-              child: Text('Help & Support'),
+            title: const Row(
+              children: [
+                Icon(
+                  Icons.help_outline_rounded,
+                  color: AppTheme.primaryGreen,
+                  size: AppConstants.iconLarge,
+                ),
+                SizedBox(width: AppConstants.paddingSmall),
+                Flexible(child: Text('Help & Support')),
+              ],
             ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Need help with AgriGuard Plus?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Need help with AgriGuard Plus?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: AppConstants.paddingMedium),
+                  const Text('• Take clear photos of affected crop areas'),
+                  const Text('• Ensure good lighting for better analysis'),
+                  const Text('• Follow the recommendations provided'),
+                  const Text('• Contact agricultural experts for severe cases'),
+                  const SizedBox(height: AppConstants.paddingMedium),
+                  const Text(
+                    'For technical support, please contact:',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  const Text('Email: support@agriguardplus.com'),
+                  const Text('Phone: +1 234-567-8900'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: AppTheme.primaryGreen),
                 ),
               ),
-              const SizedBox(height: AppConstants.paddingMedium),
-              const Text('• Take clear photos of affected crop areas'),
-              const Text('• Ensure good lighting for better analysis'),
-              const Text('• Follow the recommendations provided'),
-              const Text('• Contact agricultural experts for severe cases'),
-              const SizedBox(height: AppConstants.paddingMedium),
-              const Text(
-                'For technical support, please contact:',
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-              const Text('Email: support@agriguardplus.com'),
-              const Text('Phone: +1 234-567-8900'),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Close',
-              style: TextStyle(color: AppTheme.primaryGreen),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

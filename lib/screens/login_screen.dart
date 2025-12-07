@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:agri_gurad/services/auth_service.dart';
 import 'package:agri_gurad/config/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +19,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  Future<void> _loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final  savedEmail = prefs.getString('saved_email');
+    if (savedEmail != null) {
+      setState(() {
+        _emailController.text = savedEmail;
+        _rememberMe = true;
+      });
+    }
+  }
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -39,12 +59,23 @@ class _LoginScreenState extends State<LoginScreen> {
             // Update last login timestamp
             await AuthService().updateLastLogin();
             if (mounted) {
+              final prefs = await SharedPreferences.getInstance();
+              if (_rememberMe) {
+                await prefs.setString('saved_email', _emailController.text.trim());
+              } else {
+                await prefs.remove('saved_email');
+              }
+
               Navigator.pushReplacementNamed(context, '/dashboard');
             }
           } else if (result.needsEmailVerification) {
-            _showEmailVerificationDialog(result.errorMessage ?? 'Please verify your email');
+            _showEmailVerificationDialog(
+              result.errorMessage ?? 'Please verify your email',
+            );
           } else {
-            _showErrorSnackBar(result.errorMessage ?? 'Login failed. Please try again.');
+            _showErrorSnackBar(
+              result.errorMessage ?? 'Login failed. Please try again.',
+            );
           }
         }
       } catch (e) {
@@ -61,51 +92,67 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showEmailVerificationDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        ),
-        title: const Row(
-          children: [
-            Icon(Icons.email_outlined, color: AppTheme.primaryOrange),
-            SizedBox(width: AppConstants.paddingSmall),
-            Text('Email Verification Required'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(message),
-            const SizedBox(height: AppConstants.paddingMedium),
-            const Text(
-              'Would you like us to resend the verification email?',
-              style: TextStyle(fontWeight: FontWeight.w500),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                AppConstants.borderRadiusMedium,
+              ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            title: const Row(
+              children: [
+                Icon(Icons.email_outlined, color: AppTheme.primaryOrange),
+                SizedBox(width: AppConstants.paddingSmall),
+                Text('Email Verification Required'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(message),
+                const SizedBox(height: AppConstants.paddingMedium),
+                const Text(
+                  'Would you like us to resend the verification email?',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final result = await AuthService().resendEmailVerification();
+                  if (mounted) {
+                    if (result.success) {
+                      _showSuccessSnackBar(
+                        result.message ?? 'Verification email sent!',
+                      );
+                    } else {
+                      _showErrorSnackBar(
+                        result.errorMessage ??
+                            'Failed to send verification email',
+                      );
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                ),
+                child: const Text(
+                  'Resend Email',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final result = await AuthService().resendEmailVerification();
-              if (mounted) {
-                if (result.success) {
-                  _showSuccessSnackBar(result.message ?? 'Verification email sent!');
-                } else {
-                  _showErrorSnackBar(result.errorMessage ?? 'Failed to send verification email');
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-            child: const Text('Resend Email', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -160,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppConstants.paddingXLarge),
-                
+
                 // Header Section
                 Text(
                   'Welcome Back! 🌱',
@@ -170,9 +217,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Sign in to continue your agriculture journey',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -180,17 +227,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: AppConstants.paddingXLarge),
 
                 // Lottie Animation
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadiusLarge,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryGreen.withOpacity(0.1),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                         blurRadius: 20,
                         spreadRadius: 5,
                       ),
@@ -202,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     fit: BoxFit.contain,
                   ),
                 ),
-                
+
                 const SizedBox(height: AppConstants.paddingXLarge),
 
                 // Email Field
@@ -218,13 +267,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-.]+@([\w-]+\.)+[\w]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Enter a valid email address';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: AppConstants.paddingMedium),
 
                 // Password Field
@@ -236,11 +287,56 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
                     }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
                     return null;
                   },
+                ),
+
+                const SizedBox(height: 12),
+
+                // Remember Me & Forgot Password
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: Checkbox(
+                            value: _rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                _rememberMe = value ?? false;
+                              });
+                            },
+                            activeColor: AppTheme.primaryGreen,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Remember Me',
+                          style: GoogleFonts.inter(
+                            color: AppTheme.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: _showForgotPasswordDialog,
+                      child: Text(
+                        'Forgot Password?',
+                        style: GoogleFonts.inter(
+                          color: AppTheme.primaryOrange,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: AppConstants.paddingXLarge),
@@ -253,31 +349,34 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryGreen,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.borderRadiusMedium,
+                        ),
                       ),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                    child:
+                        _isLoading
+                            ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                            : const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                          )
-                        : const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
                   ),
                 ),
-                
+
                 const SizedBox(height: AppConstants.paddingLarge),
-                
+
                 // Login Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -287,7 +386,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pushNamed(context, '/register'),
+                      onPressed:
+                          () => Navigator.pushNamed(context, '/register'),
                       child: const Text(
                         'Register',
                         style: TextStyle(
@@ -298,9 +398,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: AppConstants.paddingMedium),
-                
+
                 // Forgot Password Link
                 Center(
                   child: TextButton(
@@ -339,7 +439,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        borderSide: BorderSide(color: AppTheme.accentGreen.withOpacity(0.3)),
+        borderSide: BorderSide(color: AppTheme.accentGreen.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
@@ -377,7 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        borderSide: BorderSide(color: AppTheme.accentGreen.withOpacity(0.3)),
+        borderSide: BorderSide(color: AppTheme.accentGreen.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
@@ -395,61 +495,80 @@ class _LoginScreenState extends State<LoginScreen> {
     final emailController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        ),
-        title: const Row(
-          children: [
-            Icon(Icons.lock_reset, color: AppTheme.primaryGreen),
-            SizedBox(width: AppConstants.paddingSmall),
-            Text('Reset Password'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Enter your email address to receive a password reset link.'),
-            const SizedBox(height: AppConstants.paddingMedium),
-            TextFormField(
-              controller: emailController,
-              decoration: _buildInputDecoration(
-                label: 'Email Address',
-                hint: 'Enter your email',
-                icon: Icons.email_outlined,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                AppConstants.borderRadiusMedium,
               ),
-              keyboardType: TextInputType.emailAddress,
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              emailController.dispose();
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (emailController.text.trim().isNotEmpty) {
-                Navigator.pop(context);
-                final result = await AuthService().resetPassword(emailController.text.trim());
-                if (mounted) {
-                  if (result.success) {
-                    _showSuccessSnackBar(result.message ?? 'Password reset email sent!');
-                  } else {
-                    _showErrorSnackBar(result.errorMessage ?? 'Failed to send reset email');
+            title: const Row(
+              children: [
+                Icon(Icons.lock_reset, color: AppTheme.primaryGreen),
+                SizedBox(width: AppConstants.paddingSmall),
+                Text('Reset Password'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Enter your email address to receive a password reset link.',
+                ),
+                const SizedBox(height: AppConstants.paddingMedium),
+                TextFormField(
+                  controller: emailController,
+                  decoration: _buildInputDecoration(
+                    label: 'Email Address',
+                    hint: 'Enter your email',
+                    icon: Icons.email_outlined,
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  emailController.dispose();
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (emailController.text.trim().isNotEmpty) {
+                    Navigator.pop(context);
+                    final result = await AuthService().resetPassword(
+                      emailController.text.trim(),
+                    );
+                    if (mounted) {
+                      if (result.success) {
+                        _showSuccessSnackBar(
+                          result.message ?? 'Password reset email sent!',
+                        );
+                      } else {
+                        _showErrorSnackBar(
+                          result.errorMessage ?? 'Failed to send reset email',
+                        );
+                      }
+                    }
                   }
-                }
-              }
-              emailController.dispose();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
-            child: const Text('Send Reset Link', style: TextStyle(color: Colors.white)),
+                  emailController.dispose();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                ),
+                child: const Text(
+                  'Send Reset Link',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 

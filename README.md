@@ -1,235 +1,141 @@
 # AgriGuard Plus
 
-> Your Smart Agriculture Companion for Crop Disease Detection
+> **Smart Agriculture Companion for Global Farmers**
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.7.2+-blue.svg)](https://flutter.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-Enabled-orange.svg)](https://firebase.google.com/)
-[![TensorFlow Lite](https://img.shields.io/badge/TensorFlow%20Lite-ML%20Powered-green.svg)](https://www.tensorflow.org/lite)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.7.2+-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-Enabled-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow_Lite-ML_Powered-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/lite)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-AgriGuard Plus is an intelligent mobile application that helps farmers and agricultural professionals detect crop diseases using advanced machine learning technology. Simply capture a photo of your crop, and get instant disease identification with treatment recommendations.
+AgriGuard Plus is an intelligent mobile application designed to empower farmers with cutting-edge technology. By leveraging Machine Learning and Cloud services, it provides instant crop disease detection, localized weather updates, and agricultural resources.
 
-## Features
+---
 
-### AI-Powered Disease Detection
-- **Real-time Analysis**: Instant crop disease identification using TensorFlow Lite
-- **High Accuracy**: Advanced machine learning model trained on agricultural datasets
-- **Multiple Diseases**: Detects various crop diseases including Bacterial Blight, Brown Spot, Leaf Smut, Blast Disease, and Tungro
-- **Confidence Scoring**: Shows prediction confidence levels with visual indicators
+## System Architecture
 
-### Smart Recommendations
-- **Treatment Suggestions**: Disease-specific treatment and prevention recommendations
-- **Expert Guidance**: Professional agricultural advice for each detected condition
-- **Preventive Measures**: Tips to prevent future occurrences
+The application follows a clean, modular architecture separating the UI, Business Logic, and Data layers.
+
+```mermaid
+graph TD
+    User[Mobile User] -->|Interacts| UI[Flutter UI Layer]
+    
+    subgraph "Frontend Application"
+        UI -->|State Assessment| Features
+        
+        subgraph Features
+            Auth[Authentication]
+            Dash[Dashboard]
+            Pred[Prediction Module]
+            Hist[History Tracker]
+            Store[Store Locator]
+        end
+        
+        Pred -->|Image Input| TFLite[TensorFlow Lite Model]
+        TFLite -->|Inference| Result[Disease Result]
+    end
+    
+    subgraph "Backend Services"
+        Auth -->|Auth Requests| FirebaseAuth[Firebase Auth]
+        Hist -->|Read/Write| Firestore[Cloud Firestore]
+        Dash -->|Fetch Data| WeatherAPI[OpenWeatherMap API]
+        Store -->|Geocoding| Gmaps[Google Maps API]
+    end
+    
+    Result -->|Save| Firestore
+```
+
+---
+
+## Key Features
+
+### AI-Powered Analysis
+- **Instant Detection**: Identify diseases like Bacterial Blight, Brown Spot, and Blast Disease.
+- **Offline Capable**: Uses on-device TensorFlow Lite for rapid inference.
+- **Recommendations**: Get immediate treatment advice and preventive measures.
+
+### Smart Dashboard
+- **Real-Time Weather**: Localized temperature and conditions via OpenWeatherMap.
+- **Quick Scans**: One-tap access to camera or gallery for crop analysis.
+- **Daily Tips**: Curated agricultural tips for better yield.
 
 ### Location Services
-- **Nearby Stores**: Find agricultural supply stores near your location
-- **Google Maps Integration**: Interactive maps with store information
-- **Store Details**: Contact information, ratings, and operating hours
+- **Nearby Stores**: Locate agricultural supply stores sorted by distance.
+- **Interactive Maps**: Integrated Google Maps for easy navigation.
 
-### History & Tracking
-- **Analysis History**: Keep track of all your crop disease analyses
-- **Progress Monitoring**: Monitor crop health over time
-- **Data Export**: Export analysis data for record keeping
+### Secure & Personalized
+- **User Profiles**: Secure login and profile management via Firebase.
+- **History Tracking**: Cloud-synced history of all your past analyses.
 
-### User Management
-- **Secure Authentication**: Firebase-powered user authentication
-- **Profile Management**: Manage your agricultural profile and preferences
-- **Data Sync**: Cloud synchronization across devices
+---
 
-## Technologies Used
+## Tech Stack
 
-- **Frontend**: Flutter 3.7.2+
-- **Backend**: Firebase (Authentication, Firestore, Storage)
+- **UI Framework**: Flutter (Dart)
+- **State Management**: Stateful Widgets & Provider
+- **Authentication**: Firebase Auth (Email/Password)
+- **Database**: Cloud Firestore
 - **Machine Learning**: TensorFlow Lite
-- **Maps**: Google Maps Flutter
-- **Animations**: Lottie Animations
-- **Image Processing**: Image Picker, Image Processing
-- **Location**: Geolocator, Permission Handler
+- **External APIs**: 
+  - OpenWeatherMap (Weather)
+  - Google Maps (Location)
 
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.7.2 or higher)
-- [Dart SDK](https://dart.dev/get-dart) (included with Flutter)
-- [Android Studio](https://developer.android.com/studio) or [VS Code](https://code.visualstudio.com/)
-- [Git](https://git-scm.com/)
-
-### Platform-specific requirements:
-
-#### For Android:
-- Android SDK (API level 21 or higher)
-- Android emulator or physical device
-
-#### For iOS:
-- macOS with Xcode 12.0 or higher
-- iOS Simulator or physical iOS device
-- CocoaPods
+---
 
 ## Getting Started
 
-### 1. Clone the Repository
+### Prerequisites
+- Flutter SDK (3.7+)
+- Android Studio / VS Code
+- Valid API Keys for Firebase, Google Maps, and OpenWeatherMap
 
-```bash
-git clone https://github.com/Aditya19110/agri_gurad.git
-cd agri_gurad
-```
+### Installation
 
-### 2. Install Dependencies
-
-```bash
-flutter pub get
-```
-
-### 3. Firebase Setup
-
-1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable Authentication, Firestore Database, and Storage
-3. Download the configuration files:
-   - For Android: `google-services.json` → `android/app/`
-   - For iOS: `GoogleService-Info.plist` → `ios/Runner/`
-
-### 4. Google Maps API Setup
-
-1. Get a Google Maps API key from [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable the following APIs:
-   - Maps SDK for Android
-   - Maps SDK for iOS
-   - Places API
-
-3. Add the API key:
-   - **Android**: Add to `android/app/src/main/AndroidManifest.xml`
-   ```xml
-   <meta-data android:name="com.google.android.geo.API_KEY"
-              android:value="YOUR_API_KEY_HERE"/>
-   ```
-   - **iOS**: Add to `ios/Runner/AppDelegate.swift`
-   ```swift
-   GMSServices.provideAPIKey("YOUR_API_KEY_HERE")
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Aditya19110/agri_gurad.git
+   cd agri_gurad
    ```
 
-### 5. TensorFlow Lite Model
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-1. Place your trained model file in `assets/tfmodel/agriguard_model.tflite`
-2. Update the disease labels in `lib/screens/prediction.dart` to match your model
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
+   ```env
+   OPENWEATHER_API_KEY=your_openweather_api_key_here
+   ```
 
-### 6. Run the Application
+4. **Run the App**
+   ```bash
+   flutter run
+   ```
 
-```bash
-# Run on debug mode
-flutter run
-
-# Run on specific device
-flutter run -d <device_id>
-
-# Build for release
-flutter build apk --release
-flutter build ios --release
-```
+---
 
 ## Project Structure
 
 ```
-agri_gurad/
-├── lib/
-│   ├── config/
-│   │   └── app_theme.dart          # App theme and styling
-│   ├── screens/
-│   │   ├── splash.dart             # Splash screen
-│   │   ├── login_screen.dart       # User authentication
-│   │   ├── registration.dart       # User registration
-│   │   ├── home_page.dart          # Main dashboard
-│   │   ├── prediction.dart         # Disease prediction
-│   │   ├── history_screen.dart     # Analysis history
-│   │   ├── nearby_store.dart       # Store locator
-│   │   └── settings.dart           # App settings
-│   ├── services/
-│   │   └── auth_service.dart       # Authentication service
-│   ├── widgets/
-│   │   └── app_drawer.dart         # Navigation drawer
-│   ├── main.dart                   # App entry point
-│   └── routes.dart                 # App routing
-├── assets/
-│   ├── lottie/                     # Animation files
-│   └── tfmodel/                    # ML model files
-├── android/                        # Android-specific files
-├── ios/                           # iOS-specific files
-├── pubspec.yaml                   # Dependencies
-└── README.md                      # This file
+lib/
+├── config/          # Themes and Constants
+├── screens/         # UI Pages (Login, Home, Prediction)
+├── services/        # Logic (Auth, Weather, History)
+├── widgets/         # Reusable Components
+├── main.dart        # Entry Point
+└── routes.dart      # Navigation Map
 ```
 
-## Testing
+---
 
-### Running Tests
+## Contributors
 
-```bash
-# Run all tests
-flutter test
-
-# Run tests with coverage
-flutter test --coverage
-
-# Run integration tests
-flutter drive --target=test_driver/app.dart
-```
-
-### Manual Testing Checklist
-
-- [ ] User registration and login
-- [ ] Image capture and selection
-- [ ] Disease prediction accuracy
-- [ ] Location services and maps
-- [ ] Data persistence and sync
-- [ ] Offline functionality
-
-## Deployment
-
-### Android Deployment
-
-1. **Generate Keystore**:
-```bash
-keytool -genkey -v -keystore ~/agriguard-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias agriguard
-```
-
-2. **Configure Signing**:
-Create `android/key.properties`:
-```properties
-storePassword=<password>
-keyPassword=<password>
-keyAlias=agriguard
-storeFile=<path-to-keystore>
-```
-
-3. **Build Release APK**:
-```bash
-flutter build apk --release
-```
-
-### iOS Deployment
-
-1. **Configure App Store Connect**
-2. **Update iOS deployment target** (iOS 12.0+)
-3. **Build for release**:
-```bash
-flutter build ios --release
-```
-
-## 👨Contributor
-
-**Aditya Kulkarni**
-- GitHub: [@Aditya19110](https://github.com/Aditya19110)
-- Email: aditya.kulkarnicse@gmail.com
-- LinkedIn: [Aditya Kulkarni](https://linkedin.com/in/aditya191103)
-
-**Vedika Lohiya**
-- GitHub: [@vedikalohiya](https://github.com/vedikalohiya)
-- Email: vedika.lohiyacse@gmail.com
-- LinkedIn: [Vedika Lohiya](https://linkedin.com/in/vedika2203)
+| **Aditya Kulkarni** | **Vedika Lohiya** |
+| :---: | :---: |
+| [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Aditya19110) | [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vedikalohiya) |
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ for farmers worldwide</p>
-  <p>🌱 <strong>Growing Technology for Better Agriculture</strong> 🌱</p>
+  <p>Made with ❤️ to support Sustainable Agriculture</p>
 </div>

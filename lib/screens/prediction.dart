@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:agri_gurad/config/app_theme.dart';
 import 'package:agri_gurad/services/history_service.dart';
 
@@ -14,7 +16,8 @@ class PredictionPage extends StatefulWidget {
   State<PredictionPage> createState() => _PredictionPageState();
 }
 
-class _PredictionPageState extends State<PredictionPage> with TickerProviderStateMixin {
+class _PredictionPageState extends State<PredictionPage>
+    with TickerProviderStateMixin {
   String _predictionResult = '';
   double _confidence = 0.0;
   bool _isLoading = false;
@@ -30,7 +33,6 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
     'Leaf Smut',
     'Blast Disease',
     'Tungro',
-    // Add more disease labels as per your model
   ];
 
   @override
@@ -40,14 +42,10 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     _animationController.forward();
 
@@ -70,29 +68,29 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
     });
 
     try {
-      // Load the TensorFlow Lite model
-      final interpreter = await Interpreter.fromAsset('assets/tfmodel/agriguard_model.tflite');
-      
-      // Preprocess the image
+      final interpreter = await Interpreter.fromAsset(
+        'assets/tfmodel/agriguard_model.tflite',
+      );
       final inputImage = await _preprocessImage(widget.imageFile!);
-      
-      // Run inference
-      final output = List.filled(1 * _diseaseLabels.length, 0.0).reshape([1, _diseaseLabels.length]);
+      final output = List.filled(
+        1 * _diseaseLabels.length,
+        0.0,
+      ).reshape([1, _diseaseLabels.length]);
       interpreter.run(inputImage, output);
-      
-      // Process the output
+
       final predictions = output[0] as List<double>;
-      final maxIndex = predictions.indexOf(predictions.reduce((a, b) => a > b ? a : b));
-      
+      final maxIndex = predictions.indexOf(
+        predictions.reduce((a, b) => a > b ? a : b),
+      );
+
       setState(() {
         _predictionResult = _diseaseLabels[maxIndex];
         _confidence = predictions[maxIndex];
         _isLoading = false;
       });
-      
-      // Save analysis result to history
+
       await _saveAnalysisToHistory();
-      
+
       interpreter.close();
     } catch (e) {
       setState(() {
@@ -100,26 +98,24 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
         _confidence = 0.0;
         _isLoading = false;
       });
-      
-      // Show error to user
+
       if (mounted) {
         _showErrorSnackBar('Failed to analyze image. Please try again.');
+        // debugPrint('Error analyzing image: $e');
       }
     }
   }
 
-  Future<List<List<List<List<double>>>>> _preprocessImage(File imageFile) async {
+  Future<List<List<List<List<double>>>>> _preprocessImage(
+    File imageFile,
+  ) async {
     final bytes = await imageFile.readAsBytes();
     final image = img.decodeImage(bytes);
-    
-    if (image == null) {
-      throw Exception('Unable to decode image');
-    }
-    
-    // Resize image to model input size (typically 224x224 for most models)
+
+    if (image == null) throw Exception('Unable to decode image');
+
     final resizedImage = img.copyResize(image, width: 224, height: 224);
-    
-    // Normalize pixel values to [0, 1]
+
     final input = List.generate(
       1,
       (index) => List.generate(
@@ -135,7 +131,7 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
         ),
       ),
     );
-    
+
     return input;
   }
 
@@ -151,9 +147,6 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
         ),
         backgroundColor: AppTheme.errorColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        ),
       ),
     );
   }
@@ -187,12 +180,11 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
     }
   }
 
-  /// Saves the analysis result to user's history
   Future<void> _saveAnalysisToHistory() async {
     if (widget.imageFile == null || _predictionResult.isEmpty) return;
 
     try {
-      final success = await _historyService.saveAnalysisResult(
+      await _historyService.saveAnalysisResult(
         diseaseResult: _predictionResult,
         confidence: _confidence,
         imagePath: widget.imageFile!.path,
@@ -203,26 +195,17 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
         },
       );
 
-      if (success && mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Analysis saved to history'),
-              ],
-            ),
+          const SnackBar(
+            content: Text('Analysis saved to history'),
             backgroundColor: AppTheme.successColor,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-            ),
           ),
         );
       }
     } catch (e) {
-      print('Error saving analysis to history: $e');
+      // print('Error saving analysis to history: $e');
     }
   }
 
@@ -231,7 +214,7 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text('Disease Analysis'),
+        title: Text('Disease Analysis', style: GoogleFonts.poppins()),
         backgroundColor: AppTheme.primaryGreen,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -247,239 +230,199 @@ class _PredictionPageState extends State<PredictionPage> with TickerProviderStat
               Container(
                 height: 300,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                       blurRadius: 20,
-                      offset: const Offset(0, 5),
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
-                  child: widget.imageFile != null
-                      ? Image.file(
-                          widget.imageFile!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        )
-                      : Container(
-                          color: AppTheme.lightGreen,
-                          child: const Center(
-                            child: Text(
-                              'No image selected',
-                              style: TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: 16,
+                  borderRadius: BorderRadius.circular(24),
+                  child:
+                      widget.imageFile != null
+                          ? Image.file(
+                            widget.imageFile!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          )
+                          : Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 50,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
-                        ),
                 ),
               ),
-              
-              const SizedBox(height: AppConstants.paddingXLarge),
-              
-              // Analysis Results Card
-              Container(
-                padding: const EdgeInsets.all(AppConstants.paddingLarge),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 20,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.analytics,
-                          color: AppTheme.primaryGreen,
-                          size: AppConstants.iconMedium,
-                        ),
-                        const SizedBox(width: AppConstants.paddingSmall),
-                        Text(
-                          'Analysis Results',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.primaryGreen,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: AppConstants.paddingLarge),
-                    
-                    if (_isLoading) ...[
-                      const Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(
-                              color: AppTheme.primaryGreen,
-                            ),
-                            SizedBox(height: AppConstants.paddingMedium),
-                            Text(
-                              'Analyzing image...',
-                              style: TextStyle(
-                                color: AppTheme.textSecondary,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ] else if (_predictionResult.isNotEmpty) ...[
-                      // Disease Result
-                      Container(
-                        padding: const EdgeInsets.all(AppConstants.paddingMedium),
-                        decoration: BoxDecoration(
-                          color: _getResultColor(_predictionResult).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                          border: Border.all(
-                            color: _getResultColor(_predictionResult).withOpacity(0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _predictionResult.toLowerCase() == 'healthy'
-                                  ? Icons.check_circle
-                                  : Icons.warning,
-                              color: _getResultColor(_predictionResult),
-                              size: AppConstants.iconLarge,
-                            ),
-                            const SizedBox(width: AppConstants.paddingMedium),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Detected: $_predictionResult',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      color: _getResultColor(_predictionResult),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Confidence: ${(_confidence * 100).toStringAsFixed(1)}%',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      const SizedBox(height: AppConstants.paddingLarge),
-                      
-                      // Confidence Bar
-                      Text(
-                        'Confidence Level',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: AppConstants.paddingSmall),
-                      LinearProgressIndicator(
-                        value: _confidence,
-                        backgroundColor: AppTheme.lightGreen,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _getResultColor(_predictionResult),
-                        ),
-                        minHeight: 8,
-                      ),
-                      
-                      const SizedBox(height: AppConstants.paddingLarge),
-                      
-                      // Recommendations
-                      Text(
-                        'Recommendations',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: AppConstants.paddingSmall),
-                      Container(
-                        padding: const EdgeInsets.all(AppConstants.paddingMedium),
-                        decoration: BoxDecoration(
-                          color: AppTheme.lightGreen,
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                        ),
-                        child: Text(
-                          _getRecommendation(_predictionResult),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ] else ...[
-                      const Center(
-                        child: Text(
-                          'Ready to analyze image',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: AppConstants.paddingXLarge),
-              
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _predictDisease,
-                      icon: const Icon(Icons.refresh, color: Colors.white),
-                      label: const Text(
-                        'Re-analyze',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryGreen,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppConstants.paddingMedium),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back, color: AppTheme.primaryGreen),
-                      label: const Text(
-                        'Back',
-                        style: TextStyle(color: AppTheme.primaryGreen),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.primaryGreen),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+
+              const SizedBox(height: 24),
+
+              // Results Section
+              if (_isLoading)
+                _buildLoadingState()
+              else if (_predictionResult.isNotEmpty)
+                _buildResults()
+              else
+                const Center(child: Text("Ready to analyze")),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Column(
+      children: [
+        const CircularProgressIndicator(color: AppTheme.primaryGreen),
+        const SizedBox(height: 16),
+        Text(
+          'Analyzing Crop Health...',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResults() {
+    final color = _getResultColor(_predictionResult);
+
+    return Column(
+      children: [
+        // Result Card
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.surfaceColor.withValues(alpha: 0.9),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            border: Border.all(color: color.withValues(alpha: 0.2)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Detection Result',
+                        style: GoogleFonts.inter(
+                          color: AppTheme.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _predictionResult,
+                        style: GoogleFonts.poppins(
+                          color: color,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  CircularPercentIndicator(
+                    radius: 40.0,
+                    lineWidth: 8.0,
+                    percent: _confidence,
+                    center: Text(
+                      "${(_confidence * 100).toInt()}%",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    progressColor: color,
+                    backgroundColor: color.withValues(alpha: 0.1),
+                    circularStrokeCap: CircularStrokeCap.round,
+                    animation: true,
+                    animationDuration: 1000,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              const SizedBox(height: 20),
+
+              Row(
+                children: [
+                  Icon(Icons.lightbulb_outline, color: AppTheme.primaryOrange),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Recommendation',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _getRecommendation(_predictionResult),
+                style: GoogleFonts.inter(
+                  color: AppTheme.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Actions
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _predictDisease,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Re-Analyze'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Report saved to Downloads (Mock)'),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.picture_as_pdf),
+                label: const Text('Save Report'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

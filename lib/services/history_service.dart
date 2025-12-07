@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 /// Service class for managing analysis history data
-/// 
+///
 /// Provides methods to save, retrieve, and manage crop analysis history
 /// using Firebase Firestore.
 class HistoryService {
@@ -11,7 +11,7 @@ class HistoryService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Saves an analysis result to the user's history
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> saveAnalysisResult({
     required String diseaseResult,
@@ -29,27 +29,27 @@ class HistoryService {
           .doc(user.uid)
           .collection('analysis_history')
           .add({
-        'diseaseResult': diseaseResult,
-        'confidence': confidence,
-        'imagePath': imagePath,
-        'recommendations': recommendations ?? '',
-        'timestamp': FieldValue.serverTimestamp(),
-        'userId': user.uid,
-        'additionalData': additionalData ?? {},
-      });
+            'diseaseResult': diseaseResult,
+            'confidence': confidence,
+            'imagePath': imagePath,
+            'recommendations': recommendations ?? '',
+            'timestamp': FieldValue.serverTimestamp(),
+            'userId': user.uid,
+            'additionalData': additionalData ?? {},
+          });
 
       // Update user's analysis count
       await _updateAnalysisCount(user.uid);
 
       return true;
     } catch (e) {
-      print('Error saving analysis result: $e');
+      debugPrint('Error saving analysis result: $e');
       return false;
     }
   }
 
   /// Gets analysis history for the current user
-  /// 
+  ///
   /// Returns a stream of analysis history documents
   Stream<QuerySnapshot> getAnalysisHistory() {
     final user = _auth.currentUser;
@@ -66,29 +66,30 @@ class HistoryService {
   }
 
   /// Gets analysis history as a one-time fetch
-  /// 
+  ///
   /// Returns a list of analysis history documents
   Future<List<QueryDocumentSnapshot>> getAnalysisHistoryOnce() async {
     try {
       final user = _auth.currentUser;
       if (user == null) return [];
 
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('analysis_history')
-          .orderBy('timestamp', descending: true)
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('analysis_history')
+              .orderBy('timestamp', descending: true)
+              .get();
 
       return querySnapshot.docs;
     } catch (e) {
-      print('Error fetching analysis history: $e');
+      debugPrint('Error fetching analysis history: $e');
       return [];
     }
   }
 
   /// Deletes a specific analysis from history
-  /// 
+  ///
   /// Returns true if successful, false otherwise
   Future<bool> deleteAnalysis(String analysisId) async {
     try {
@@ -104,7 +105,7 @@ class HistoryService {
 
       return true;
     } catch (e) {
-      print('Error deleting analysis: $e');
+      debugPrint('Error deleting analysis: $e');
       return false;
     }
   }
@@ -115,16 +116,17 @@ class HistoryService {
       final user = _auth.currentUser;
       if (user == null) return 0;
 
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('analysis_history')
-          .count()
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('analysis_history')
+              .count()
+              .get();
 
       return querySnapshot.count ?? 0;
     } catch (e) {
-      print('Error getting analysis count: $e');
+      debugPrint('Error getting analysis count: $e');
       return 0;
     }
   }
@@ -138,7 +140,7 @@ class HistoryService {
         'lastAnalysisAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Error updating analysis count: $e');
+      debugPrint('Error updating analysis count: $e');
     }
   }
 
@@ -148,11 +150,12 @@ class HistoryService {
       final user = _auth.currentUser;
       if (user == null) return {};
 
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('analysis_history')
-          .get();
+      final querySnapshot =
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('analysis_history')
+              .get();
 
       int totalAnalyses = querySnapshot.docs.length;
       int healthyCount = 0;
@@ -161,7 +164,7 @@ class HistoryService {
       double totalConfidence = 0;
 
       for (var doc in querySnapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final diseaseResult = data['diseaseResult'] ?? '';
         final confidence = (data['confidence'] ?? 0.0).toDouble();
 
@@ -185,7 +188,7 @@ class HistoryService {
         'averageConfidence': averageConfidence,
       };
     } catch (e) {
-      print('Error getting analysis stats: $e');
+      debugPrint('Error getting analysis stats: $e');
       return {};
     }
   }

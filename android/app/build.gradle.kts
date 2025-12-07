@@ -27,6 +27,13 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+// Load .env file
+val envFile = rootProject.file("../.env")
+val envProperties = Properties()
+if (envFile.exists()) {
+    envFile.inputStream().use { envProperties.load(it) }
+}
+
     defaultConfig {
         applicationId = "com.example.agri_gurad"
         minSdk = 23
@@ -35,7 +42,8 @@ android {
         versionName = flutter.versionName
         
         // Secure API key configuration
-        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("flutter.mapsApiKey") 
+        manifestPlaceholders["MAPS_API_KEY"] = envProperties.getProperty("MAPS_API_KEY")
+            ?: localProperties.getProperty("flutter.mapsApiKey") 
             ?: System.getenv("MAPS_API_KEY") 
             ?: "YOUR_API_KEY_HERE"
     }

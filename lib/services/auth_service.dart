@@ -1,27 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Service class for handling user authentication and user data management
-/// 
-/// Provides methods for user registration, login, logout, and user data operations
-/// using Firebase Authentication and Firestore.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Signs in a user with email and password
-  /// 
-  /// Returns [AuthResult] containing success status and optional error message
-  /// 
-  /// Example:
-  /// ```dart
-  /// final result = await authService.login('user@example.com', 'password');
-  /// if (result.success) {
-  ///   // Login successful
-  /// } else {
-  ///   // Handle error: result.errorMessage
-  /// }
-  /// ```
   Future<AuthResult> login(String email, String password) async {
     try {
       // Input validation
@@ -87,19 +70,6 @@ class AuthService {
     }
   }
 
-  /// Registers a new user with email, password, and additional information
-  /// 
-  /// Returns [AuthResult] containing success status and optional error message
-  /// 
-  /// Example:
-  /// ```dart
-  /// final result = await authService.register(
-  ///   email: 'user@example.com',
-  ///   password: 'securePassword',
-  ///   name: 'John Doe',
-  ///   address: '123 Farm Street',
-  /// );
-  /// ```
   Future<AuthResult> register({
     required String email,
     required String password,
